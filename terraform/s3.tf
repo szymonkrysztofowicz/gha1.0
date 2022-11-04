@@ -9,6 +9,6 @@ resource "aws_s3_bucket" "mys3bucket" {
 resource "aws_s3_bucket_versioning" "s3versioning" {
   bucket = aws_s3_bucket.mys3bucket
   versioning_configuration {
-    status = "enabled"
+    status = "Enabled"
   }
 }
