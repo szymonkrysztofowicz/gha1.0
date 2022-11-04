@@ -23,7 +23,7 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     environment: QA
-     steps:
+    steps:
     - name: Checkout
       uses: actions/checkout@v3
                   
@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: tf-plan
-        path: tfplan
+        path: ./terraform/tfplan
         if-no-files-found: error
         retention-days: 14 #by default 90 days
 
@@ -71,7 +71,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: tf-plan
-        path: tfplan
+        path: ./terraform/tfplan
                 
     - name: Apply
       run: terraform apply tfplan/tfplan
