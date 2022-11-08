@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "test"
+    bucket = "test1"
     key    = "test"
     region = "test"
     dynamodb_table = "test"
