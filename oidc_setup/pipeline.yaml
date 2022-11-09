@@ -1,0 +1,28 @@
+name: Pipeline using AWS OIDC
+
+on:
+  push:
+    branches:
+      - '*'
+
+env:
+  ROLE_TO_ASSUME: GitHubActionsRole
+  AWS_ACCOUNT_ID: 756415581801
+  AWS_REGION: eu-west-1
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: obtain AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.ROLE_TO_ASSUME }}
+          role-session-name: ${{ github.ref_name }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
