@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Example setup for establishing OIDC trust between AWS and GitHub
+
+Parameters:
+  Thumbprint:
+    Type: String
+    Description: SHA1 fingerprint of public cert for token.actions.githubusercontent.com
+    Default: 6938fd4d98bab03faadb97b34396831e3780aea1
+  GitHubRepoName:
+    Type: String
+    Description: GitHub repository name that will use the created role. The format should include org/owner eg. "aws/aws-cli"
+
+Resources:
+  OIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - !Ref Thumbprint
+  GitHubActionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      RoleName: GitHubActionsRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Ref OIDCProvider
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepoName}:*
+      MaxSessionDuration: 3600
+      Description: Role assumed by GitHub Actions pipeline
+      Policies:
+        - PolicyName: GitHubActionsRoleExamplePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ecr:*'
+                Resource: '*'
