@@ -50,4 +50,13 @@ There are two GitHub Actions keys used in the workflows:
     * AWS_REGION - region
     * AWS_DYNAMODB_TABLE - dynamodbtable
 
-5. Check retention period for artifacts (`retention-days` key). By default, it is 90 days.
+5. Setup permissions for accessing AWS resources. This can be done either by:
+
+.creating an AWS access key, configuring it as a secret for the repo, and then using it in your pipeline environment, which is the example setup that is used in      qa.yml and prod.yml pipelines:
+AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+or establishing OIDC trust between AWS and GitHub, example of which can be found in oidc_setup folder:
+first create an OIDC provider and role that will be used by GitHub, by deploying the cfn-oidc-github-trust.yaml template. You should update the role policy depending on your requirements
+then you can create your GitHub workflow, in which you should include the aws-actions/configure-aws-credentials action, which first obtains a JWT from GitHub, which is then exchanged for AWS credentials using STS
+
+6. Check retention period for artifacts (retention-days key). By default, it is 90 days.
